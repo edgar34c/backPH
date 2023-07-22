@@ -23,8 +23,8 @@ if(isset($_GET['url']))
             $usu->Cadastro(); 
             break;
         case'login':
-            $usu->ControleServico();
-            $usu->login();
+            $sla->ControleServico();
+            $sla->login();
             break;       
               
 
