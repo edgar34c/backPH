@@ -1,7 +1,7 @@
 <?php
  
 include_once 'model/Conexao.php';
- 
+include_once 'Controller/ControllerServico.php';
 include_once 'model/servico.php';
 
 //minha url
@@ -15,16 +15,16 @@ if(isset($_GET['url']))
         //rotas para categoria
 
         case 'home':
-            $usu->ControleServico();
+            $usu = new ControleServico();
             $usu->home();
             break;
         case'cadastro':
-            $usu->ControleServico();
+            $usu = new ControleServico();
             $usu->Cadastro(); 
             break;
         case'login':
-            $sla->ControleServico();
-            $sla->login();
+            $usu = new ControleServico();
+            $usu->login();
             break;       
               
 

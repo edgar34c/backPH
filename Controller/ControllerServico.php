@@ -9,76 +9,42 @@ class ControleServico{
 
     
      public function Cadastro(){
-        
-
-        function resposta($codigo, $ok, $msg){
-            // Retorna a resposta como JSON
-            header("Access-Control-Allow-Origin: http://localhost:3000");
-            header("Access-Control-Allow-Methods: POST");
-            header("Access-Control-Allow-Headers: Content-Type");
-            header('Content-Type: application/json');
-            http_response_code($codigo);
-            $jsonRes = json_encode(['ok' => $ok, 'msg' => $msg]);
-            echo($jsonRes);
-            die;
-        }
-        
-        if($_SERVER['REQUEST_METHOD'] == "OPTIONS"){
-            resposta(200, true, '');
-        }
-        
-        if($_SERVER['REQUEST_METHOD'] != "POST"){
-            resposta(400, false, 'Método Inválido');
-        }
-        
-        $json = file_get_contents('php://input');
-        
-        if(!$json){
-            resposta(400, false, "Corpo da requisição não encontrado");
-        }
-        
-        $json = file_get_contents('php://input');
-        $data = json_decode($json);
-        
         $cad = new servico();
-        if (isset($data->nomeProd)) {
-            $cad->nome = $data->nomeProd;
-            $cad->preco = $data->preco;
-            $cad->descricao = $data->descricao;
-        } elseif(isset($_FILES['file'])) {
-            $arquivos = $_FILES['files'];
-            $targetDir = "img/"; // Pasta de destino para os arquivos enviados
-            $numFiles = count($arquivo); // Número de arquivos enviados
-            if (isset($arquivo[0]->tmp_name) && isset($arquivo[0]->tmp_name)) {
-                $fileName = basename($arquivo[0]->name);
-                $targetFilePath = $targetDir . $fileName;
-                // Tenta mover o arquivo enviado para a pasta de destino
-                if (move_uploaded_file($arquivo[0]->tmp_name, $targetFilePath)) {
-                    $cad->imagem = $fileName;
-                    $cad->cadastrar();
-                    resposta(200, true, "Login validado com sucesso");
-                } else {
-                    resposta(400, false, "Erro ao enviar os arquivos!");
-                }
+        $cad->nome = $_POST['nomeProd'];
+        $cad->preco = $_POST['preco'];
+        $cad->descricao = $_POST['descricao'];
+        
+        $targetDir = "img/"; // Pasta de destino para os arquivos enviados
+        $uploadedFiles = $_FILES['images']; // Arquivos enviados
+        $numFiles = count($uploadedFiles['name']); // Número de arquivos enviados
+        $fileName = basename($uploadedFiles['name'][0]);
+        $targetFilePath = $targetDir . $fileName;
+        
+            // Tenta mover o arquivo enviado para a pasta de destino
+        if (move_uploaded_file($uploadedFiles['tmp_name'][0], $targetFilePath)) {
+            $cad->imagem = $fileName;
+            $cad->cadastrar();
+            $response = ['msg' => 'Cadastro concluído com sucesso'];
+        } else {
+            $response = ['msg' => 'Erro ao enviar o cadastro!'];
+        }
+        
                 // Loop através de todos os arquivos enviados
-                for ($i = 0; $i < $numFiles; $i++) {
-                    $fileName = ($arquivo[$i]); // Nome do arquivo
+                for ($i = 1; $i < $numFiles; $i++) {
+                    $fileName = basename($uploadedFiles['name'][$i]); // Nome do arquivo
                     $targetFilePath = $targetDir . $fileName; // Caminho completo do arquivo de destino
                     // Tenta mover o arquivo enviado para a pasta de destino
-                    if (move_uploaded_file($arquivo[$i]->tmp_name, $targetFilePath)) {
+                    if (move_uploaded_file($uploadedFiles['tmp_name'][$i], $targetFilePath)) {
                         $cad->imagem = $fileName;
+                        //colocar na tabela nova
                         $cad->cadastrar2();
+                        $response = ['msg' => 'Cadastro concluído com sucesso'];
                     } else {
-                        resposta(400, false, "Erro ao enviar os arquivos!");
+                        $response = ['msg' => 'Erro ao enviar o cadastro!'];
                     }
                 }
-            } else {
-                resposta(400, false, "Erro ao enviar os arquivos!");
-            }
-            
-            resposta(200, true, "Cadastro realizado com sucesso");
         
-        }
+        echo json_encode($response);        
         
      }
 
@@ -131,14 +97,6 @@ class ControleServico{
      }
 
         public function Home(){
-        
- 
-
-        header("Access-Control-Allow-Origin: http://localhost:3000");
-        header("Access-Control-Allow-Methods: POST");
-        header("Access-Control-Allow-Headers: Content-Type");
-        header('Content-Type: application/json');
-
         $fun = new servico;
         $fun->inicio();
         $produtos = $_SESSION['pega_produt'];
