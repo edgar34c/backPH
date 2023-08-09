@@ -27,8 +27,25 @@ if(isset($_GET['url']))
             $usu->login();
             break;       
               
+        case'descricao':
+            $usu = new ControleServico();
+            $usu->info_prod();
+        break;
 
+        case 'atualizar':
+            $usu = new ControleServico();
+            $usu->atualizado();
+        break;
 
+        case 'excluir':
+            $usu = new ControleServico();
+            $usu->excluir();
+        break;
+
+        case 'retornar':
+            $usu = new ControleServico();
+            $usu->retornar();
+        break;
         
         default:
             echo "página não encontrada<br>

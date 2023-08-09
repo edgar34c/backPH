@@ -1,5 +1,6 @@
 <?php
     header("Access-Control-Allow-Origin: http://localhost:3000");
+    header("Access-Control-Allow-Origin: http://192.168.1.8:3000");
     
     class Conexao{
 

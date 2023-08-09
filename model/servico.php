@@ -2,6 +2,8 @@
 session_start();
 
 header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Origin: http://192.168.1.8:3000");
+
 
 class servico
 {
@@ -104,61 +106,56 @@ class servico
         $cmd->bindParam(":id", $id);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+
         $_SESSION['pega_descri'] = $result;
     }
 
-    public function consultar()
-    {
-        $con = Conexao::conectar(); //acessar o BD
-        $cmd = $con->prepare("SELECT * FROM produtos "); //comando SQL
-        $cmd->execute(); //executar o comando SQL
-        $results =  $cmd->fetchAll(PDO::FETCH_OBJ);
-        $_SESSION['pegas'] = $results;
+    //CRUD PH
+
+    public function atualizado(){
+        try {        
+            $con = Conexao::conectar();
+    
+            $cmd = $con->prepare("UPDATE produtos SET 
+                nome = :nome,
+                preco = :preco,
+                descricao = :descricao
+                WHERE codproduto = :codproduto");
+    
+            $cmd->bindParam(":codproduto", $this->codproduto);
+            $cmd->bindParam(":nome", $this->nome);
+            $cmd->bindParam(":preco", $this->preco);
+            $cmd->bindParam(":descricao", $this->descricao);
+            
+            if ($cmd->execute()) {
+                return true; // Atualização bem-sucedida
+            } else {
+                return false; // Erro ao atualizar
+            }
+        } catch (Exception $e) {
+            throw new Exception('Erro ao atualizar: ' . $e->getMessage());
+        }
     }
 
-     //CRUD PH
 
-     public function atualizado(){
-            
-        $con = Conexao::conectar();
-        
-
-        $cmd = $con->prepare("UPDATE produtos SET 
-         nome = :nome,
-         preco = :preco,
-         descricao = :descricao
-         WHERE codproduto = :codproduto");
-         //enviando o valor dos parametros
-         $cmd->bindParam(":codproduto", $this->codproduto);
-         $cmd->bindParam(":nome", $this->nome);
-         $cmd->bindParam(":preco", $this->preco);
-         $cmd->bindParam(":descricao", $this->descricao);
-         $cmd->execute();
-          var_dump($cmd);
-     }
-
-
-     public function excluir(){
+    public function excluir($id){
         $con = Conexao::conectar();
 
         $cmd = $con->prepare("DELETE FROM produtos 
         WHERE codproduto = :codproduto");
         //enviar valores
-        $cmd->bindParam(":codproduto", $this->codproduto);
+        $cmd->bindParam(":codproduto", $id);
         $cmd->execute();
-        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
-         
-        
-     }
+    }
 
-     public function retornar()
-     {
-         $con = Conexao::conectar();//acessar o BD
-         $cmd = $con->prepare("SELECT * FROM produtos
-         WHERE codproduto = :codproduto"); //comando SQL
-         $cmd->bindParam(":codproduto", $this->codproduto);
-         $cmd->execute();//executar o comando SQL
-        
-         
-     }
+    public function retornar()
+    {
+        $con = Conexao::conectar();//acessar o BD
+        $cmd = $con->prepare("SELECT * FROM produtos
+        WHERE codproduto = :codproduto"); //comando SQL
+        $cmd->bindParam(":codproduto", $this->codproduto);
+        $cmd->execute();//executar o comando SQL
+        $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+        $_SESSION['pega_prodById'] = $result;
+    }
 }
