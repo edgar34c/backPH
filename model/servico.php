@@ -72,19 +72,6 @@ class servico
         $cmd->execute(); //executar o comando
     }
 
-    public function jp()
-    {
-        $con = Conexao::conectar();
-        $cmd = $con->prepare("SELECT * FROM imagens JOIN produtos 
-             ON produto.codproduto = imagens.codproduto 
-             WHERE produto.codproduto = :codproduto");
-        $cmd->bindParam(":codproduto", $this->codproduto);
-        $cmd->execute();
-        return $cmd->fetchAll(PDO::FETCH_OBJ);
-    }
-
-
-
     //seleciona produtos que aparece na home
     public function inicio()
     {
@@ -96,19 +83,31 @@ class servico
     }
 
     //seleciona produto que aparece na descrição do produto
-    public function info_prod($id)
-    {
-        $con = Conexao::conectar();
-        $query = "SELECT * FROM produtos JOIN imagens
-            ON produtos.codproduto = imagens.codproduto 
-            WHERE produtos.codproduto = :id";
+public function info_prod($id)
+{
+    $con = Conexao::conectar();
+    $query = "SELECT * FROM produtos JOIN imagens
+        ON produtos.codproduto = imagens.codproduto 
+        WHERE produtos.codproduto = :id";
+    $cmd = $con->prepare($query);
+    $cmd->bindParam(":id", $id);
+    $cmd->execute();
+    $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
+
+    if (empty($result)) {
+        // Define a chave mesmo que esteja vazia
+        $query = 'SELECT * FROM `produtos` WHERE  codproduto = :id';
         $cmd = $con->prepare($query);
         $cmd->bindParam(":id", $id);
         $cmd->execute();
         $result = $cmd->fetchAll(PDO::FETCH_ASSOC);
-
+        $_SESSION['pega_descri'] = $result;
+    } else {
         $_SESSION['pega_descri'] = $result;
     }
+}
+
+    
 
     //CRUD PH
 
